@@ -1,15 +1,30 @@
-export interface SignUpDTO {
+import { IUser } from '../Model';
+
+export interface ManualSignUpDTO {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
-    signUpType: string;
+}
+export interface GoogleSignInDTO {
+    email: string;
+    googleIdToken: string;
+    firstName: string;
+    lastName: string;
 }
 
-export interface LogInDTO {
+export interface ManualLogInDTO {
     email: string;
     password?: string;
-    signInType: string;
+}
+export interface GoogleLogInDTO {
+    email: string;
+    googleIdToken?: string;
+}
+
+export interface loginPayload {
+    token: string;
+    user: IUser;
 }
 
 export interface ContactUsDTO {
@@ -29,9 +44,4 @@ export interface VerifyOtpDTO {
 export interface ResetPasswordDTO {
     token: string;
     newPassword: string;
-}
-
-export enum SignUpType {
-    GOOGLE = 'GOOGLE',
-    MANUAL = 'MANUAL',
 }

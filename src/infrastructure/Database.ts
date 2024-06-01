@@ -16,7 +16,7 @@ const env = process.env.NODE_ENV || 'development';
 
 export interface IDatabase {
     sequelize: Sequelize;
-    Sequelize: Sequelize;
+    Sequelize: typeof Sequelize;
     coverLetter: typeof CoverLetter;
     // Education?
     otp: typeof OTP;
@@ -59,7 +59,7 @@ let Database = {
     Sequelize: Sequelize,
 };
 
-// export default Database as IDatabase;
+export default Database as IDatabase;
 
 let test = Database;
 test.user.create;

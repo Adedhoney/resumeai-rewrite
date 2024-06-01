@@ -12,24 +12,28 @@ import {
 import {
     ContactUsDTO,
     FeedbackDTO,
-    LogInDTO,
+    ManualLogInDTO,
     ResetPasswordDTO,
-    SignUpDTO,
-    SignUpType,
+    ManualSignUpDTO,
+    GoogleSignInDTO,
     VerifyOtpDTO,
+    loginPayload,
 } from '@module/Domain/DTO';
 import { IUser, User } from '@module/Domain/Model';
 import { IAccountRepository } from '@module/Domain/Repository/AccountRepository';
 import { IAccountNotification } from '@module/Infrastructure/Notification';
 
 export interface IAccountService {
-    SignUp(data: SignUpDTO): Promise<void | { token: string; user: IUser }>;
-    LogIn(data: LogInDTO): Promise<{ token: string; user: IUser } | void>;
+    ManualSignUp(data: ManualSignUpDTO): Promise<void>;
+    GoogleSignIn(
+        data: GoogleSignInDTO,
+    ): Promise<{ token: string; user: IUser }>;
+    LogIn(data: ManualLogInDTO): Promise<{ token: string; user: IUser } | void>;
     VerifyEmail(data: VerifyOtpDTO): Promise<{ token: string; user: IUser }>;
     GetUser(userId: string): Promise<IUser>;
     GiveFeedback(data: FeedbackDTO, authData: IUser): Promise<void>;
     ContactUs(data: ContactUsDTO): Promise<void>;
-    // UpdateInfo(data: UpdateInfoDTO, userId: string): Promise<User>;
+    // UpgradetoPremium(data: UpdateInfoDTO, userId: string): Promise<User>;
     // UpdatePassword(data: UpdatePassWordDTO, userId: string): Promise<void>;
     ForgotPassword(email: string): Promise<void>;
     VerifyOTP(data: VerifyOtpDTO): Promise<{ token: string }>;
@@ -45,78 +49,71 @@ export class AccountService implements IAccountService {
         this.acctnotif = acctnotif;
     }
 
-    async SignUp(
-        data: SignUpDTO,
-    ): Promise<void | { token: string; user: IUser }> {
+    async ManualSignUp(data: ManualSignUpDTO): Promise<void> {
         const emailExists = await this.acctrepo.getUserByEmail(data.email);
 
-        if (data.signUpType === SignUpType.MANUAL) {
-            if (emailExists) {
-                throw new CustomError(
-                    'Account already exists, Log in instead.',
-                );
-            }
-            const password = await encryptPassword(data.password);
-            const userId = generateRandomId();
-
-            const user = {
-                userId,
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                password,
-                emailverified: false,
-                filledPersonalInfo: false,
-            };
-            await this.acctrepo.saveUser(user);
-            // send verifaication email
-            const otp = generateRandomOTP();
-            await this.acctrepo.saveOTP({
-                email: data.email,
-                otp,
-                expiresAt: `${Date.now() + 1200000}`,
-            });
-            await this.acctnotif.confirmMail(data.email, otp, data.firstName);
-        } else if (data.signUpType === SignUpType.GOOGLE) {
-            if (emailExists) {
-                const login = await this.LogIn({
-                    email: data.email,
-                    signInType: data.signUpType,
-                });
-                return login;
-            }
-
-            const userId = generateRandomId();
-            const user = {
-                userId,
-                email: data.email,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                emailverified: true,
-                filledPersonalInfo: false,
-            };
-            await this.acctrepo.saveUser(user);
-
-            const login = await this.LogIn({
-                email: data.email,
-                signInType: data.signUpType,
-            });
-            return login;
+        if (emailExists) {
+            throw new CustomError('Account already exists, Log in instead.');
         }
+        const password = await encryptPassword(data.password);
+        const userId = generateRandomId();
+
+        const user = {
+            userId,
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            password,
+            emailverified: false,
+            filledPersonalInfo: false,
+        };
+        await this.acctrepo.saveUser(user);
+        // send verifaication email
+        const otp = generateRandomOTP();
+        await this.acctrepo.saveOTP({
+            email: data.email,
+            otp,
+            expiresAt: `${Date.now() + 1200000}`,
+        });
+        await this.acctnotif.confirmMail(data.email, otp, data.firstName);
     }
 
-    async LogIn(
-        data: LogInDTO,
-    ): Promise<{ token: string; user: IUser } | void> {
+    async GoogleSignIn(data: GoogleSignInDTO): Promise<loginPayload> {
+        const emailExists = await this.acctrepo.getUserByEmail(data.email);
+
+        // validate google authentication
+
+        if (emailExists) {
+            const token = generateAuthToken(
+                emailExists.userId,
+                emailExists.email,
+            );
+
+            delete emailExists.password;
+            return { token, user: emailExists };
+        }
+
+        const userId = generateRandomId();
+        const user = {
+            userId,
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            emailverified: true,
+            filledPersonalInfo: false,
+        };
+        await this.acctrepo.saveUser(user);
+
+        const login = await this.LogIn({
+            email: data.email,
+        });
+        return login as loginPayload;
+    }
+
+    async LogIn(data: ManualLogInDTO): Promise<loginPayload | void> {
         const user = await this.acctrepo.getUserByEmail(data.email);
         if (!user) {
             throw new CustomError('Account not found');
-        }
-        if (data.signInType === SignUpType.GOOGLE) {
-            const token = generateAuthToken(user.userId, user.email);
-
-            delete user.password;
-            return { token, user };
         }
         const validPassword = await decryptPassword(
             data.password as string,

@@ -18,7 +18,7 @@ export interface IAccountRepository {
     getOTP(email: string, otp: string): Promise<IOTP>;
 }
 
-export class AcccountRepository implements IAccountRepository {
+export class AccountRepository implements IAccountRepository {
     constructor(readonly database: IDatabase) {
         this.database = database;
     }
