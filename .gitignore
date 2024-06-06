@@ -1,6 +1,4 @@
-.vscode/
 uploadedFiles/
 /node_modules
 /.env
-/vscode
 /dataFlow.txt

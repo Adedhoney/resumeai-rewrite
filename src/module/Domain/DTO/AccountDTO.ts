@@ -13,6 +13,29 @@ export interface GoogleSignInDTO {
     lastName: string;
 }
 
+export interface saveProfessionalInfoDTO {
+    skills?: { skill: string; yearsOfExp: string }[];
+    workExp?: {
+        isCurrentWork: boolean;
+        expType: string;
+        employer: string;
+        jobTitle: string;
+        details: string;
+        startDate: string;
+        endDate?: string;
+    }[];
+    education?: {
+        school: string;
+        degree: string;
+        fieldOfStudy: string;
+        startDate: string;
+        endDate?: string;
+        grade?: string;
+        activities?: string;
+        description?: string;
+    }[];
+}
+
 export interface ManualLogInDTO {
     email: string;
     password?: string;

@@ -11,10 +11,10 @@ import {
 import { User } from './User';
 
 export interface ISkill {
-    id?: number;
+    id?: string;
     skill: string;
     userId: string;
-    yearsOfExp: number;
+    yearsOfExp: string;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -23,7 +23,7 @@ export interface ISkill {
 export class Skill extends Model implements ISkill {
     @AutoIncrement
     @NotNull
-    declare id?: number;
+    declare id?: string;
 
     @Column({ type: DataType.UUID })
     @NotNull
@@ -38,5 +38,5 @@ export class Skill extends Model implements ISkill {
 
     @Column
     @NotNull
-    declare yearsOfExp: number;
+    declare yearsOfExp: string;
 }

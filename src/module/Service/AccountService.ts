@@ -18,9 +18,18 @@ import {
     GoogleSignInDTO,
     VerifyOtpDTO,
     loginPayload,
+    saveProfessionalInfoDTO,
 } from '@module/Domain/DTO';
-import { IUser, User } from '@module/Domain/Model';
-import { IAccountRepository } from '@module/Domain/Repository/AccountRepository';
+import {
+    IEducation,
+    ISkill,
+    IUser,
+    IWorkExperience,
+} from '@module/Domain/Model';
+import {
+    IAccountRepository,
+    ISaveProfessionalInfo,
+} from '@module/Domain/Repository/AccountRepository';
 import { IAccountNotification } from '@module/Infrastructure/Notification';
 
 export interface IAccountService {
@@ -30,9 +39,14 @@ export interface IAccountService {
     ): Promise<{ token: string; user: IUser }>;
     LogIn(data: ManualLogInDTO): Promise<{ token: string; user: IUser } | void>;
     VerifyEmail(data: VerifyOtpDTO): Promise<{ token: string; user: IUser }>;
-    GetUser(userId: string): Promise<IUser>;
+    GetUser(userId: string): Promise<{ user: IUser; dashboardInfo: any }>;
     GiveFeedback(data: FeedbackDTO, authData: IUser): Promise<void>;
     ContactUs(data: ContactUsDTO): Promise<void>;
+    setProfessionalInfo(
+        data: saveProfessionalInfoDTO,
+        userId: string,
+    ): Promise<void>;
+    getProfessionalInfo(userId: string): Promise<IUser>;
     // UpgradetoPremium(data: UpdateInfoDTO, userId: string): Promise<User>;
     // UpdatePassword(data: UpdatePassWordDTO, userId: string): Promise<void>;
     ForgotPassword(email: string): Promise<void>;
@@ -156,11 +170,14 @@ export class AccountService implements IAccountService {
         return { token, user };
     }
 
-    async GetUser(userId: string): Promise<IUser> {
+    async GetUser(
+        userId: string,
+    ): Promise<{ user: IUser; dashboardInfo: any }> {
         const user = await this.acctrepo.getUserById(userId);
+        const dashboardInfo = await this.acctrepo.getUserDashboard(userId);
         delete user.password;
 
-        return user;
+        return { user, dashboardInfo };
     }
 
     async ForgotPassword(email: string): Promise<void> {
@@ -213,5 +230,50 @@ export class AccountService implements IAccountService {
 
     async ContactUs(data: ContactUsDTO): Promise<void> {
         await this.acctnotif.ContactUsMail(data.email, data.name, data.message);
+    }
+
+    async setProfessionalInfo(
+        data: saveProfessionalInfoDTO,
+        userId: string,
+    ): Promise<void> {
+        const { education, skills, workExp } = data;
+        if (!education && !skills && !workExp) {
+            throw new CustomError(
+                'Provide values for either skills, work experience or education',
+            );
+        }
+        const repoData: ISaveProfessionalInfo = {};
+        if (education) {
+            const edus: IEducation[] = [];
+            for (let info of education) {
+                const educationId = generateRandomId();
+                const edu = { ...info, educationId, userId };
+                edus.push(edu);
+            }
+            repoData.education = edus;
+        }
+        if (workExp) {
+            const workExperience: IWorkExperience[] = [];
+            for (let info of workExp) {
+                const experienceId = generateRandomId();
+                const exp = { ...info, experienceId, userId };
+                workExperience.push(exp);
+            }
+            repoData.workExp = workExperience;
+        }
+        if (skills) {
+            const skillsData: ISkill[] = [];
+            for (let info of skills) {
+                const skill = { ...info, userId };
+                skillsData.push(skill);
+            }
+            repoData.skills = skillsData;
+        }
+
+        await this.acctrepo.saveProfessionalInfo(repoData);
+    }
+    async getProfessionalInfo(userId: string): Promise<IUser> {
+        const user = await this.acctrepo.getProfessionalInfo(userId);
+        return user;
     }
 }

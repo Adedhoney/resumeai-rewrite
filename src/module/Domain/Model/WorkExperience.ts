@@ -13,13 +13,14 @@ import { User } from './User';
 export interface IWorkExperience {
     id?: number;
     experienceId: string;
-    userId: string;
+    userId?: string;
+    isCurrentWork: boolean;
     expType: string;
     employer: string;
     jobTitle: string;
     details: string;
     startDate: string;
-    endDate: string;
+    endDate?: string;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -44,6 +45,10 @@ export class WorkExperience extends Model implements IWorkExperience {
     @NotNull
     @BelongsTo(() => User)
     declare userId: string;
+
+    @Column
+    @NotNull
+    declare isCurrentWork: boolean;
 
     @Column
     @NotNull

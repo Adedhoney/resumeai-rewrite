@@ -6,6 +6,7 @@ import {
     User,
     WorkExperience,
     OTP,
+    Education,
 } from '@module/Domain/Model';
 import fs from 'fs';
 import path from 'path';
@@ -18,7 +19,7 @@ export interface IDatabase {
     sequelize: Sequelize;
     Sequelize: typeof Sequelize;
     coverLetter: typeof CoverLetter;
-    // Education?
+    education: typeof Education;
     otp: typeof OTP;
     skill: typeof Skill;
     uploadedResume: typeof UploadedResume;
