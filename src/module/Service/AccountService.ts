@@ -18,7 +18,7 @@ import {
     GoogleSignInDTO,
     VerifyOtpDTO,
     loginPayload,
-    saveProfessionalInfoDTO,
+    SaveProfessionalInfoDTO,
 } from '@module/Domain/DTO';
 import {
     IEducation,
@@ -42,11 +42,11 @@ export interface IAccountService {
     GetUser(userId: string): Promise<{ user: IUser; dashboardInfo: any }>;
     GiveFeedback(data: FeedbackDTO, authData: IUser): Promise<void>;
     ContactUs(data: ContactUsDTO): Promise<void>;
-    setProfessionalInfo(
-        data: saveProfessionalInfoDTO,
+    SetProfessionalInfo(
+        data: SaveProfessionalInfoDTO,
         userId: string,
     ): Promise<void>;
-    getProfessionalInfo(userId: string): Promise<IUser>;
+    GetProfessionalInfo(userId: string): Promise<IUser>;
     // UpgradetoPremium(data: UpdateInfoDTO, userId: string): Promise<User>;
     // UpdatePassword(data: UpdatePassWordDTO, userId: string): Promise<void>;
     ForgotPassword(email: string): Promise<void>;
@@ -118,10 +118,9 @@ export class AccountService implements IAccountService {
         };
         await this.acctrepo.saveUser(user);
 
-        const login = await this.LogIn({
-            email: data.email,
-        });
-        return login as loginPayload;
+        const token = generateAuthToken(user.userId, user.email);
+
+        return { token, user };
     }
 
     async LogIn(data: ManualLogInDTO): Promise<loginPayload | void> {
@@ -232,8 +231,8 @@ export class AccountService implements IAccountService {
         await this.acctnotif.ContactUsMail(data.email, data.name, data.message);
     }
 
-    async setProfessionalInfo(
-        data: saveProfessionalInfoDTO,
+    async SetProfessionalInfo(
+        data: SaveProfessionalInfoDTO,
         userId: string,
     ): Promise<void> {
         const { education, skills, workExp } = data;
@@ -272,7 +271,7 @@ export class AccountService implements IAccountService {
 
         await this.acctrepo.saveProfessionalInfo(repoData);
     }
-    async getProfessionalInfo(userId: string): Promise<IUser> {
+    async GetProfessionalInfo(userId: string): Promise<IUser> {
         const user = await this.acctrepo.getProfessionalInfo(userId);
         return user;
     }

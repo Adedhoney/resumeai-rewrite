@@ -11,7 +11,7 @@ export interface ICoverService {
         userId: string,
     ): Promise<ICoverLetter>;
     GetCover(coverId: string): Promise<ICoverLetter>;
-    GetCover(coverId: string): Promise<ICoverLetter>;
+    GetUserCovers(userId: string): Promise<ICoverLetter[]>;
 }
 
 export class CoverService implements ICoverService {

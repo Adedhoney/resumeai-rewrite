@@ -8,6 +8,7 @@ import {
     ManualSignUpDTO,
     ResetPasswordDTO,
     VerifyOtpDTO,
+    SaveProfessionalInfoDTO,
 } from '@module/Domain/DTO';
 import { IAccountService } from '@module/Service';
 import { NextFunction, RequestHandler, Response, Request } from 'express';
@@ -150,6 +151,37 @@ export class AccountController {
             await this.service.ContactUs(req.body.data);
 
             return successResponse(res, `Message Gotten`);
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    setProfessionalInfo: RequestHandler = async (
+        req: IBaseRequest<SaveProfessionalInfoDTO>,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            await this.service.SetProfessionalInfo(
+                req.body.data,
+                res.locals.authData.userId,
+            );
+            return successResponse(res, `Info saved`);
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    getProfessionalInfo: RequestHandler = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const user = await this.service.GetProfessionalInfo(
+                res.locals.authData.userId,
+            );
+            return successResponse(res, 'user Info', user);
         } catch (err) {
             next(err);
         }

@@ -17,14 +17,27 @@ export enum StatusCode {
     INTERNAL_ERROR = 500,
 }
 
-export const successResponse = (res: Response, message: string, data: object = {}, code?: number) => {
+export const successResponse = (
+    res: Response,
+    message: string,
+    data: object = {},
+    code?: number,
+) => {
     if (!code) code = StatusCode.SUCCESS;
-    return res.status(code).send(new ResponseDTO(ResponseStatus.SUCCESS, message, data));
+    return res
+        .status(code)
+        .send(new ResponseDTO(ResponseStatus.SUCCESS, message, true, data));
 };
 
-export const errorResponse = (res: Response, message: string, code?: number) => {
+export const errorResponse = (
+    res: Response,
+    message: string,
+    code?: number,
+) => {
     if (!code) code = StatusCode.SUCCESS;
-    return res.status(code).send(new ResponseDTO(ResponseStatus.ERROR, message));
+    return res
+        .status(code)
+        .send(new ResponseDTO(ResponseStatus.ERROR, message, false));
 };
 
 export const generateRandomId = (): string => {
@@ -35,7 +48,10 @@ export const encryptPassword = async (password: string) => {
     return await bcrypt.hash(password, 8);
 };
 
-export const decryptPassword = async (password: string, hashedPassword: string) => {
+export const decryptPassword = async (
+    password: string,
+    hashedPassword: string,
+) => {
     return await bcrypt.compare(password, hashedPassword);
 };
 
@@ -44,9 +60,13 @@ export const getFileRootDir = (dir: string) => {
 };
 
 export const generateAuthToken = (userId: string, email: string): string => {
-    return jwt.sign({ userId, email }, config.TOKEN_KEYS.JWT_SECRET as jwt.Secret, {
-        expiresIn: '24h',
-    });
+    return jwt.sign(
+        { userId, email },
+        config.TOKEN_KEYS.JWT_SECRET as jwt.Secret,
+        {
+            expiresIn: '24h',
+        },
+    );
 };
 export const generateOtpToken = (email: string): string => {
     return jwt.sign({ email }, config.TOKEN_KEYS.JWT_SECRET as jwt.Secret, {
@@ -65,7 +85,10 @@ export interface ITokenPayload extends jwt.JwtPayload {
 }
 
 export const verifyAuthToken = (token: string) => {
-    return jwt.verify(token, config.TOKEN_KEYS.JWT_SECRET as jwt.Secret) as ITokenPayload;
+    return jwt.verify(
+        token,
+        config.TOKEN_KEYS.JWT_SECRET as jwt.Secret,
+    ) as ITokenPayload;
 };
 
 export const getCurrentTimeStamp = () => {
