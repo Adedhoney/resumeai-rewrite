@@ -7,10 +7,17 @@ export interface ManualSignUpDTO {
     lastName: string;
 }
 export interface GoogleSignInDTO {
+    accessToken: string;
+}
+
+export interface GoogleUserDTO {
+    id: string;
     email: string;
-    googleIdToken: string;
-    firstName: string;
-    lastName: string;
+    verified_email: boolean;
+    name: string;
+    given_name: string;
+    family_name: string;
+    picture: string;
 }
 
 export interface SaveProfessionalInfoDTO {

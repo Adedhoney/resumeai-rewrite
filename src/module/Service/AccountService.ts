@@ -19,6 +19,7 @@ import {
     VerifyOtpDTO,
     loginPayload,
     SaveProfessionalInfoDTO,
+    GoogleUserDTO,
 } from '@module/Domain/DTO';
 import {
     IEducation,
@@ -31,11 +32,12 @@ import {
     ISaveProfessionalInfo,
 } from '@module/Domain/Repository/AccountRepository';
 import { IAccountNotification } from '@module/Infrastructure/Notification';
+import axios from 'axios';
 
 export interface IAccountService {
     ManualSignUp(data: ManualSignUpDTO): Promise<void>;
     GoogleSignIn(
-        data: GoogleSignInDTO,
+        token: GoogleSignInDTO,
     ): Promise<{ token: string; user: IUser }>;
     LogIn(data: ManualLogInDTO): Promise<{ token: string; user: IUser } | void>;
     VerifyEmail(data: VerifyOtpDTO): Promise<{ token: string; user: IUser }>;
@@ -92,10 +94,19 @@ export class AccountService implements IAccountService {
         await this.acctnotif.confirmMail(data.email, otp, data.firstName);
     }
 
-    async GoogleSignIn(data: GoogleSignInDTO): Promise<loginPayload> {
-        const emailExists = await this.acctrepo.getUserByEmail(data.email);
-
+    async GoogleSignIn(googleToken: GoogleSignInDTO): Promise<loginPayload> {
         // validate google authentication
+        const { data }: { data: GoogleUserDTO } = await axios.get(
+            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${googleToken}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${googleToken}`,
+                    Accept: 'application/json',
+                },
+            },
+        );
+
+        const emailExists = await this.acctrepo.getUserByEmail(data.email);
 
         if (emailExists) {
             const token = generateAuthToken(
@@ -111,9 +122,9 @@ export class AccountService implements IAccountService {
         const user = {
             userId,
             email: data.email,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            emailverified: true,
+            firstName: data.given_name,
+            lastName: data.family_name,
+            emailverified: data.verified_email,
             filledPersonalInfo: false,
         };
         await this.acctrepo.saveUser(user);
