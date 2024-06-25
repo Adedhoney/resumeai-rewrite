@@ -26,7 +26,7 @@ const envs = [
 
 envs.forEach((value, index) => {
     if (!process.env[envs[index]]) {
-        const message = 'Fatal Error: env ' + envs[index] + ' not define';
+        const message = 'Fatal Error: env ' + envs[index] + ' not defined';
 
         throw new Error(message);
     }

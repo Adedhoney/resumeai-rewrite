@@ -27,7 +27,7 @@ export interface IDatabase {
     workExp: typeof WorkExperience;
 }
 
-const files = fs.readdirSync('@module/Domain/Model').filter((file) => {
+const files = fs.readdirSync('src/module/Domain/Model').filter((file) => {
     return (
         file.indexOf('.') !== 0 &&
         file !== 'index.ts' &&
@@ -36,21 +36,28 @@ const files = fs.readdirSync('@module/Domain/Model').filter((file) => {
     );
 });
 
-const models = files.map((fileName) => {
-    return path.join('@module/Domain/Model', fileName);
-});
+const models = [
+    CoverLetter,
+    Skill,
+    UploadedResume,
+    User,
+    WorkExperience,
+    OTP,
+    Education,
+];
+
 let sequelize = new Sequelize({
     database: config.DATABASE.database,
     dialect: config.DATABASE.dialect,
     username: config.DATABASE.username,
-    password: config.DATABASE.password,
+    // password: config.DATABASE.password,
     storage: ':memory:',
     models,
 });
 
 let Database = {
     coverLetter: CoverLetter,
-    // Education?
+    education: Education,
     otp: OTP,
     skill: Skill,
     uploadedResume: UploadedResume,

@@ -5,6 +5,8 @@ import {
     AutoIncrement,
     NotNull,
     Unique,
+    DataType,
+    PrimaryKey,
 } from 'sequelize-typescript';
 
 export interface IOTP {
@@ -16,22 +18,32 @@ export interface IOTP {
     updatedAt?: string;
 }
 
-@Table
+@Table({
+    tableName: 'otps',
+    timestamps: true, // If you want to manage createdAt and updatedAt timestamps
+})
 export class OTP extends Model implements IOTP {
     @AutoIncrement
-    @NotNull
+    @PrimaryKey
+    @Column
     declare id?: number;
 
-    @Column
-    @NotNull
     @Unique
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
     declare email: string;
 
-    @Column
-    @NotNull
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
     declare otp: string;
 
-    @Column
-    @NotNull
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
     declare expiresAt: string;
 }

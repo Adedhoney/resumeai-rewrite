@@ -11,6 +11,7 @@ import {
     HasOne,
     Unique,
     IsNull,
+    ForeignKey,
 } from 'sequelize-typescript';
 import { UploadedResume } from './UploadedResume';
 import { CoverLetter } from './CoverLetter';
@@ -29,45 +30,45 @@ export interface IUser {
     updatedAt?: string;
 }
 
-@Table
+@Table({
+    tableName: 'users',
+    timestamps: true, // If you want to manage createdAt and updatedAt timestamps
+})
 export class User extends Model implements IUser {
     @AutoIncrement
-    @NotNull
+    @PrimaryKey
+    @Column
     declare id?: number;
 
-    @Column({ type: DataType.UUID })
     @PrimaryKey
-    @NotNull
-    @HasMany(() => UploadedResume)
-    @HasMany(() => CoverLetter)
+    @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @Column({ type: DataType.STRING })
-    @NotNull
+    @HasMany(() => UploadedResume)
+    declare uploadedResume: UploadedResume;
+
+    @HasMany(() => CoverLetter)
+    declare coverLetter: CoverLetter;
+
+    @Column({ type: DataType.STRING, allowNull: false })
     declare firstName: string;
 
-    @Column({ type: DataType.STRING })
-    @NotNull
+    @Column({ type: DataType.STRING, allowNull: false })
     declare lastName: string;
 
-    @Column({ type: DataType.STRING })
-    @IsNull
+    @Column({ type: DataType.STRING, allowNull: true })
     declare password?: string;
 
-    @Column({ type: DataType.STRING() })
-    @NotNull
     @Unique
+    @Column({ type: DataType.STRING() })
     declare email: string;
 
-    @Column({ type: DataType.STRING() })
-    @NotNull
+    @Column({ type: DataType.STRING(), allowNull: false })
     declare premiumDueDate: string;
 
-    @Column({ type: DataType.BOOLEAN() })
-    @NotNull
+    @Column({ type: DataType.BOOLEAN(), allowNull: false })
     declare emailVerified: boolean;
 
-    @Column({ type: DataType.BOOLEAN() })
-    @NotNull
+    @Column({ type: DataType.BOOLEAN(), allowNull: false })
     declare filledPersonalInfo: boolean;
 }

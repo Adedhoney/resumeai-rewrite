@@ -7,11 +7,12 @@ import {
     PrimaryKey,
     NotNull,
     BelongsTo,
+    ForeignKey,
 } from 'sequelize-typescript';
 import { User } from './User';
 
 export interface ISkill {
-    id?: string;
+    id?: number;
     skill: string;
     userId: string;
     yearsOfExp: string;
@@ -19,24 +20,34 @@ export interface ISkill {
     updatedAt?: string;
 }
 
-@Table
+@Table({
+    tableName: 'skills',
+    timestamps: true, // If you want to manage createdAt and updatedAt timestamps
+})
 export class Skill extends Model implements ISkill {
     @AutoIncrement
-    @NotNull
-    declare id?: string;
-
-    @Column({ type: DataType.UUID })
-    @NotNull
     @PrimaryKey
-    @BelongsTo(() => User)
+    @Column
+    declare id?: number;
+
+    @PrimaryKey
+    @ForeignKey(() => User)
+    @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @Column
+    @BelongsTo(() => User)
+    declare user: User;
+
     @PrimaryKey
-    @NotNull
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
     declare skill: string;
 
-    @Column
-    @NotNull
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
     declare yearsOfExp: string;
 }

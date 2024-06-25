@@ -7,6 +7,8 @@ import {
     PrimaryKey,
     NotNull,
     BelongsTo,
+    AllowNull,
+    ForeignKey,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -30,47 +32,45 @@ export enum ExpType {
     EMPLOYMENT = 'EMPLOYMENT',
 }
 
-@Table
+@Table({
+    tableName: 'work_experience',
+    timestamps: true, // If you want to manage createdAt and updatedAt timestamps
+})
 export class WorkExperience extends Model implements IWorkExperience {
     @AutoIncrement
-    @NotNull
+    @PrimaryKey
+    @Column
     declare id?: number;
 
-    @Column({ type: DataType.UUID })
     @PrimaryKey
-    @NotNull
+    @Column({ type: DataType.UUID })
     declare experienceId: string;
 
-    @Column({ type: DataType.UUID })
-    @NotNull
-    @BelongsTo(() => User)
+    @ForeignKey(() => User)
+    @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @Column
-    @NotNull
+    @BelongsTo(() => User)
+    declare user: User;
+
+    @Column({ type: DataType.BOOLEAN, allowNull: false })
     declare isCurrentWork: boolean;
 
-    @Column
-    @NotNull
+    @Column({ type: DataType.BOOLEAN, allowNull: false })
     declare expType: string;
 
-    @Column
-    @NotNull
+    @Column({ type: DataType.BOOLEAN, allowNull: false })
     declare employer: string;
 
-    @Column
-    @NotNull
+    @Column({ type: DataType.BOOLEAN, allowNull: false })
     declare jobTitle: string;
 
-    @Column({ type: DataType.TEXT('long') })
-    @NotNull
+    @Column({ type: DataType.TEXT('long'), allowNull: false })
     declare details: string;
 
-    @Column(DataType.DATE)
-    @NotNull
+    @Column({ type: DataType.DATE, allowNull: false })
     declare startDate: string;
 
-    @Column(DataType.DATE)
-    @NotNull
+    @Column({ type: DataType.DATE, allowNull: false })
     declare endDate: string;
 }

@@ -7,6 +7,7 @@ import {
     PrimaryKey,
     NotNull,
     BelongsTo,
+    ForeignKey,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -20,27 +21,30 @@ export interface IUploadedResume {
     updatedAt?: string;
 }
 
-@Table
+@Table({
+    tableName: 'uploadedResumes',
+    timestamps: true, // If you want to manage createdAt and updatedAt timestamps
+})
 export class UploadedResume extends Model implements IUploadedResume {
     @AutoIncrement
-    @NotNull
+    @PrimaryKey
+    @Column
     declare id?: number;
 
     @PrimaryKey
-    @NotNull
-    @Column({ type: DataType.UUID })
+    @Column({ type: DataType.UUID, allowNull: false })
     declare resumeId: string;
 
-    @Column({ type: DataType.UUID })
-    @NotNull
-    @BelongsTo(() => User)
+    @ForeignKey(() => User)
+    @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @Column({ type: DataType.STRING() })
-    @NotNull
+    @BelongsTo(() => User)
+    declare user: User;
+
+    @Column({ type: DataType.STRING(), allowNull: false })
     declare resumeName: string;
 
-    @Column({ type: DataType.TEXT('long') })
-    @NotNull
+    @Column({ type: DataType.TEXT('long'), allowNull: false })
     declare resumeText: string;
 }

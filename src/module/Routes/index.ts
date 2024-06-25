@@ -18,6 +18,8 @@ import { Router } from 'express';
 const router = Router();
 
 const db = Database;
+db.sequelize.sync().then(() => console.log('synced'));
+db.user.sync();
 
 const acctrepo = new AccountRepository(db);
 const coverrepo = new CoverRepository(db);
