@@ -4,39 +4,49 @@ export const ManualSignUpSchema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
     firstName: Joi.string().required(),
+    middleName: Joi.string().optional(),
     lastName: Joi.string().required(),
 });
 export const GoogleSignInSchema = Joi.object({
-    email: Joi.string().required(),
-    googleIdToken: Joi.string().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    accessToken: Joi.string().required(),
 });
 
 export const SaveProfessionalInfoSchema = Joi.object({
-    skills: Joi.object({
-        skill: Joi.string().required(),
-        yearsOfExp: Joi.string().required(),
-    }).optional(),
-    workExp: Joi.object({
-        isCurrentWork: Joi.boolean().required(),
-        expType: Joi.string().required(),
-        employer: Joi.string().required(),
-        jobTitle: Joi.string().required(),
-        details: Joi.string().required(),
-        startDate: Joi.string().required(),
-        endDate: Joi.string().optional(),
-    }).optional(),
-    education: Joi.object({
-        school: Joi.string().required(),
-        degree: Joi.string().required(),
-        fieldOfStudy: Joi.string().required(),
-        startDate: Joi.string().required(),
-        endDate: Joi.string().optional(),
-        grade: Joi.string().optional(),
-        activities: Joi.string().optional(),
-        description: Joi.string().optional(),
-    }).optional(),
+    skills: Joi.array()
+        .items(
+            Joi.object().keys({
+                skill: Joi.string().required(),
+                yearsOfExp: Joi.number().required(),
+            }),
+        )
+        .optional(),
+    workExp: Joi.array()
+        .items(
+            Joi.object().keys({
+                isCurrentWork: Joi.boolean().required(),
+                expType: Joi.string().required(),
+                employer: Joi.string().required(),
+                jobTitle: Joi.string().required(),
+                details: Joi.string().required(),
+                startDate: Joi.string().required(),
+                endDate: Joi.string().optional(),
+            }),
+        )
+        .optional(),
+    education: Joi.array()
+        .items(
+            Joi.object().keys({
+                school: Joi.string().required(),
+                degree: Joi.string().required(),
+                fieldOfStudy: Joi.string().required(),
+                startDate: Joi.string().required(),
+                endDate: Joi.string().optional(),
+                grade: Joi.string().optional(),
+                activities: Joi.string().optional(),
+                description: Joi.string().optional(),
+            }),
+        )
+        .optional(),
 });
 export const ManualLogInSchema = Joi.object({
     email: Joi.string().required(),
@@ -64,6 +74,6 @@ export const GenerateCoverSchema = Joi.object({
     jobTitle: Joi.string().required(),
     jobDescription: Joi.string().required(),
     infoType: Joi.string().required(),
-    resumeId: Joi.string().required(),
-    manualInfo: Joi.string().required(),
+    resumeId: Joi.string().optional(),
+    manualInfo: Joi.object().optional(),
 });

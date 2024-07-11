@@ -26,7 +26,10 @@ export class AccountController {
         try {
             await this.service.ManualSignUp(req.body.data);
 
-            return successResponse(res, 'Successful');
+            return successResponse(
+                res,
+                `Successful. Email verification has been sent to your email`,
+            );
         } catch (err) {
             next(err);
         }
@@ -123,7 +126,7 @@ export class AccountController {
         try {
             await this.service.ResetPassword(req.body.data);
 
-            return successResponse(res, `Password Token`);
+            return successResponse(res, `Password updated`);
         } catch (err) {
             next(err);
         }

@@ -8,6 +8,7 @@ import {
     NotNull,
     BelongsTo,
     ForeignKey,
+    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -27,7 +28,7 @@ export interface IUploadedResume {
 })
 export class UploadedResume extends Model implements IUploadedResume {
     @AutoIncrement
-    @PrimaryKey
+    @Unique
     @Column
     declare id?: number;
 
@@ -39,7 +40,7 @@ export class UploadedResume extends Model implements IUploadedResume {
     @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'userId')
     declare user: User;
 
     @Column({ type: DataType.STRING(), allowNull: false })

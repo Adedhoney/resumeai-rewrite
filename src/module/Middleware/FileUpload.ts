@@ -5,7 +5,7 @@ import { CustomError } from '@application/Error/Error';
 // File Upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        let folderPath = __dirname + '/../uploadedFiles';
+        let folderPath = __dirname + '/../../../uploadedFiles';
         if (!fs.existsSync(folderPath)) {
             fs.mkdirSync(folderPath, { recursive: true });
         }

@@ -3,10 +3,10 @@ import http from 'http';
 import app from './app';
 import config from '@application/Config/config';
 
-const port: number = config.PORT | 8080;
+const port: number = config.PORT || 8080;
 
 const server: http.Server = app.listen(port, () => {
-    console.log(`Server listening on ${port} `);
+    console.log(`Server is listening on ${port} `);
 });
 
 server.on('error', (err) => {

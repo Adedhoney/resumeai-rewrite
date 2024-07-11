@@ -7,6 +7,7 @@ import {
     PrimaryKey,
     BelongsTo,
     ForeignKey,
+    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -32,7 +33,7 @@ export interface IEducation {
 })
 export class Education extends Model implements IEducation {
     @AutoIncrement
-    @PrimaryKey
+    @Unique
     @Column
     declare id?: number;
 
@@ -44,7 +45,7 @@ export class Education extends Model implements IEducation {
     @Column({ type: DataType.UUID })
     declare userId: string;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'userId')
     declare user: User;
 
     @Column({

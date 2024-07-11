@@ -52,7 +52,6 @@ class MailService {
     }
 
     async sendMail(options: MailInterface): Promise<void> {
-        console.log(options);
         try {
             const send = await this.transporter.sendMail(options);
             console.log('Mail sent successfully!!');

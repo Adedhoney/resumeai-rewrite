@@ -74,22 +74,25 @@ export class AccountService implements IAccountService {
         const password = await encryptPassword(data.password);
         const userId = generateRandomId();
 
-        const user = {
+        const user: IUser = {
             userId,
             email: data.email,
             firstName: data.firstName,
             lastName: data.lastName,
             password,
-            emailverified: false,
+            emailVerified: false,
             filledPersonalInfo: false,
         };
+        if (data.middleName) {
+            user.middleName = data.middleName;
+        }
         await this.acctrepo.saveUser(user);
         // send verifaication email
         const otp = generateRandomOTP();
         await this.acctrepo.saveOTP({
             email: data.email,
             otp,
-            expiresAt: `${Date.now() + 1200000}`,
+            expiresAt: `${Date.now() / 1000 + 1200}`,
         });
         await this.acctnotif.confirmMail(data.email, otp, data.firstName);
     }
@@ -137,26 +140,30 @@ export class AccountService implements IAccountService {
     async LogIn(data: ManualLogInDTO): Promise<loginPayload | void> {
         const user = await this.acctrepo.getUserByEmail(data.email);
         if (!user) {
-            throw new CustomError('Account not found');
+            throw new CustomError('Account not found', 400);
         }
         const validPassword = await decryptPassword(
             data.password as string,
             user.password as string,
         );
         if (!validPassword) {
-            throw new CustomError('Invalid username or password');
+            throw new CustomError('Invalid username or password', 400);
         }
         if (!user.emailVerified) {
             const otp = generateRandomOTP();
             await this.acctrepo.saveOTP({
                 email: data.email,
                 otp,
-                expiresAt: getCurrentTimeStamp(),
+                expiresAt: `${Date.now() / 1000 + 1200}`,
             });
             await this.acctnotif.confirmMail(data.email, otp, user.firstName);
-            return;
+            throw new CustomError(
+                'Email not verified. Verification email has been sent to your email',
+            );
         }
         const token = generateAuthToken(user.userId, user.email);
+
+        console.log(user);
 
         delete user.password;
 
@@ -201,7 +208,7 @@ export class AccountService implements IAccountService {
         await this.acctrepo.saveOTP({
             email: email,
             otp,
-            expiresAt: getCurrentTimeStamp(),
+            expiresAt: `${Date.now() / 1000 + 1200}`,
         });
         await this.acctnotif.forgotPasswordEmail(email, otp, user.firstName);
     }
@@ -217,7 +224,7 @@ export class AccountService implements IAccountService {
     }
 
     async ResetPassword(data: ResetPasswordDTO): Promise<void> {
-        const { email } = verifyOtpToken(data.token);
+        const { email } = verifyOtpToken(data.otpToken);
         if (!email) {
             throw new CustomError('Token invalid or expired');
         }

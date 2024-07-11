@@ -4,6 +4,7 @@ export interface ManualSignUpDTO {
     email: string;
     password: string;
     firstName: string;
+    middleName?: string;
     lastName: string;
 }
 export interface GoogleSignInDTO {
@@ -21,7 +22,7 @@ export interface GoogleUserDTO {
 }
 
 export interface SaveProfessionalInfoDTO {
-    skills?: { skill: string; yearsOfExp: string }[];
+    skills?: { skill: string; yearsOfExp: number }[];
     workExp?: {
         isCurrentWork: boolean;
         expType: string;
@@ -68,6 +69,6 @@ export interface VerifyOtpDTO {
 }
 
 export interface ResetPasswordDTO {
-    token: string;
+    otpToken: string;
     newPassword: string;
 }

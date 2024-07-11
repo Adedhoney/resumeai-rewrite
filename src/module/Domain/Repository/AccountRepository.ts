@@ -35,12 +35,12 @@ export class AccountRepository implements IAccountRepository {
 
     async getUserByEmail(email: string): Promise<IUser> {
         const user = await this.database.user.findOne({ where: { email } });
-        return user as IUser;
+        return user?.dataValues as IUser;
     }
 
     async getUserById(userId: string): Promise<IUser> {
         const user = await this.database.user.findOne({ where: { userId } });
-        return user as IUser;
+        return user?.dataValues as IUser;
     }
 
     async getUserDashboard(userId: string): Promise<any> {
@@ -61,7 +61,7 @@ export class AccountRepository implements IAccountRepository {
     }
     async getProfessionalInfo(userId: string): Promise<IUser> {
         const user = await this.database.user.findOne({
-            where: { id: userId },
+            where: { userId },
             include: [
                 {
                     model: this.database.skill,
@@ -77,7 +77,7 @@ export class AccountRepository implements IAccountRepository {
                 },
             ],
         });
-        return user as IUser;
+        return user?.dataValues as IUser;
     }
 
     async saveProfessionalInfo(data: ISaveProfessionalInfo): Promise<void> {
@@ -85,11 +85,11 @@ export class AccountRepository implements IAccountRepository {
 
         try {
             if (data.skills) {
-                const skillss: Optional<
+                const skills: Optional<
                     ISkill,
                     'id' | 'createdAt' | 'updatedAt'
                 >[] = data.skills;
-                await this.database.skill.bulkCreate(skillss, {
+                await this.database.skill.bulkCreate(skills, {
                     fields: ['userId', 'skill', 'yearsOfExp'],
                     transaction,
                 });
@@ -103,7 +103,7 @@ export class AccountRepository implements IAccountRepository {
                     fields: [
                         'experienceId',
                         'userId',
-                        'currentWork',
+                        'isCurrentWork',
                         'expType',
                         'employer',
                         'jobTitle',

@@ -1,7 +1,7 @@
 import { generateRandomId } from '@application/Utils';
 import { IUploadedResume, IUser } from '@module/Domain/Model';
 import { IResumeRepository } from '@module/Domain/Repository';
-import { readFileSync } from 'fs';
+import { readFileSync, unlink } from 'fs';
 import pdf from 'pdf-parse';
 
 export interface IResumeService {
@@ -31,6 +31,9 @@ export class ResumeService implements IResumeService {
             resumeName: file.originalname,
         };
         await this.resumerepo.saveResume(resume);
+        unlink(filePath, (error) => {
+            if (error) throw error;
+        });
         return resumeId;
     }
 

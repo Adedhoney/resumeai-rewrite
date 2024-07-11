@@ -8,6 +8,7 @@ import {
     NotNull,
     BelongsTo,
     ForeignKey,
+    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -15,7 +16,7 @@ export interface ISkill {
     id?: number;
     skill: string;
     userId: string;
-    yearsOfExp: string;
+    yearsOfExp: number;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -26,7 +27,7 @@ export interface ISkill {
 })
 export class Skill extends Model implements ISkill {
     @AutoIncrement
-    @PrimaryKey
+    @Unique
     @Column
     declare id?: number;
 
@@ -35,7 +36,7 @@ export class Skill extends Model implements ISkill {
     @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'userId')
     declare user: User;
 
     @PrimaryKey
@@ -46,8 +47,8 @@ export class Skill extends Model implements ISkill {
     declare skill: string;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.INTEGER,
         allowNull: false,
     })
-    declare yearsOfExp: string;
+    declare yearsOfExp: number;
 }

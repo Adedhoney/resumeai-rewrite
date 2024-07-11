@@ -38,6 +38,12 @@ export class CoverService implements ICoverService {
             );
         }
         if (data.infoType === InfoType.RESUME) {
+            if (!data.resumeId) {
+                throw new CustomError(
+                    'When resume option is chosen, resumeId must be provided',
+                    400,
+                );
+            }
             const resume = await this.resumerepo.getResume(
                 data.resumeId as string,
             );
@@ -55,7 +61,13 @@ export class CoverService implements ICoverService {
             };
             await this.coverrepo.saveCover(cover);
             return cover;
-        } else {
+        } else if (data.infoType === InfoType.MANUAL) {
+            if (!data.manualInfo) {
+                throw new CustomError(
+                    'When manual option is chosen, manualInfo must be provided',
+                    400,
+                );
+            }
             const info = JSON.stringify(data.manualInfo);
             const coverLetter = await this.openaiservice.GetManualCover({
                 ...data,
@@ -71,6 +83,11 @@ export class CoverService implements ICoverService {
             };
             await this.coverrepo.saveCover(cover);
             return cover;
+        } else {
+            throw new CustomError(
+                `infoType must be equal to either to ${InfoType.MANUAL} or ${InfoType.RESUME}`,
+                400,
+            );
         }
     }
 

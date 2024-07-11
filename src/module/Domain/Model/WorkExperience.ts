@@ -5,10 +5,9 @@ import {
     DataType,
     AutoIncrement,
     PrimaryKey,
-    NotNull,
     BelongsTo,
-    AllowNull,
     ForeignKey,
+    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -38,7 +37,7 @@ export enum ExpType {
 })
 export class WorkExperience extends Model implements IWorkExperience {
     @AutoIncrement
-    @PrimaryKey
+    @Unique
     @Column
     declare id?: number;
 
@@ -50,27 +49,27 @@ export class WorkExperience extends Model implements IWorkExperience {
     @Column({ type: DataType.UUID, allowNull: false })
     declare userId: string;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'userId')
     declare user: User;
 
     @Column({ type: DataType.BOOLEAN, allowNull: false })
     declare isCurrentWork: boolean;
 
-    @Column({ type: DataType.BOOLEAN, allowNull: false })
+    @Column({ type: DataType.STRING, allowNull: false })
     declare expType: string;
 
-    @Column({ type: DataType.BOOLEAN, allowNull: false })
+    @Column({ type: DataType.STRING, allowNull: false })
     declare employer: string;
 
-    @Column({ type: DataType.BOOLEAN, allowNull: false })
+    @Column({ type: DataType.STRING, allowNull: false })
     declare jobTitle: string;
 
     @Column({ type: DataType.TEXT('long'), allowNull: false })
     declare details: string;
 
-    @Column({ type: DataType.DATE, allowNull: false })
+    @Column({ type: DataType.STRING, allowNull: false })
     declare startDate: string;
 
-    @Column({ type: DataType.DATE, allowNull: false })
-    declare endDate: string;
+    @Column({ type: DataType.STRING, allowNull: true })
+    declare endDate?: string;
 }

@@ -7,6 +7,7 @@ import {
     PrimaryKey,
     BelongsTo,
     ForeignKey,
+    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
@@ -27,7 +28,7 @@ export interface ICoverLetter {
 })
 export class CoverLetter extends Model implements ICoverLetter {
     @AutoIncrement
-    @PrimaryKey
+    @Unique
     @Column
     declare id?: number;
 
@@ -45,7 +46,7 @@ export class CoverLetter extends Model implements ICoverLetter {
     })
     declare userId: string;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'userId')
     declare user: User;
 
     @Column({
