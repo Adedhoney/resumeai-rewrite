@@ -50,7 +50,7 @@ let sequelize = new Sequelize({
     database: config.DATABASE.database,
     dialect: config.DATABASE.dialect,
     username: config.DATABASE.username,
-    // password: config.DATABASE.password,
+    password: config.DATABASE.password,
     storage: ':memory:',
     models,
 });
