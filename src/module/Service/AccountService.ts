@@ -163,8 +163,6 @@ export class AccountService implements IAccountService {
         }
         const token = generateAuthToken(user.userId, user.email);
 
-        console.log(user);
-
         delete user.password;
 
         return { token, user };
