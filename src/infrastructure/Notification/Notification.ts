@@ -5,7 +5,7 @@ export class Notification {
     public async email(params: NotificationParams): Promise<void> {
         const mail = new MailService();
         const options = {
-            from: 'From MyResumeAI',
+            from: config.SMTP.EMAIL!,
             to: params.to,
             subject: params.subject as string,
             text: params.text,

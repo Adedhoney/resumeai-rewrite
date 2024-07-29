@@ -43,6 +43,30 @@ export interface SaveProfessionalInfoDTO {
         description?: string;
     }[];
 }
+export interface EditSkillDTO {
+    skill?: string;
+    yearsOfExp?: number;
+}
+
+export interface EditWorkExperienceDTO {
+    isCurrentWork?: boolean;
+    expType?: string;
+    employer?: string;
+    jobTitle?: string;
+    details?: string;
+    startDate?: string;
+    endDate?: string;
+}
+export interface EditEducationDTO {
+    school?: string;
+    degree?: string;
+    fieldOfStudy?: string;
+    startDate?: string;
+    endDate?: string;
+    grade?: string;
+    activities?: string;
+    description?: string;
+}
 
 export interface ManualLogInDTO {
     email: string;

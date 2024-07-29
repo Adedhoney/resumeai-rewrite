@@ -5,7 +5,6 @@ import {
     DataType,
     AutoIncrement,
     PrimaryKey,
-    NotNull,
     BelongsTo,
     ForeignKey,
     Unique,

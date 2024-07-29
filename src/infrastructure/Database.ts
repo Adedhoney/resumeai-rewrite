@@ -13,7 +13,7 @@ import path from 'path';
 import { Sequelize } from 'sequelize-typescript';
 
 // const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
+// const env = process.env.NODE_ENV || 'development';
 
 export interface IDatabase {
     sequelize: Sequelize;
@@ -50,7 +50,10 @@ let sequelize = new Sequelize({
     database: config.DATABASE.database,
     dialect: config.DATABASE.dialect,
     username: config.DATABASE.username,
-    password: config.DATABASE.password,
+    password:
+        config.ENVIRONMENT === 'local_development'
+            ? undefined
+            : config.DATABASE.password,
     storage: ':memory:',
     models,
 });
