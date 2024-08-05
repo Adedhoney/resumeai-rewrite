@@ -14,11 +14,11 @@ export class CoverController {
         next: NextFunction,
     ) => {
         try {
-            await this.service.GenerateCover(
+            const cover = await this.service.GenerateCover(
                 req.body.data,
                 res.locals.authData.userId,
             );
-            return successResponse(res, 'Successful');
+            return successResponse(res, 'Successful', cover);
         } catch (err) {
             next(err);
         }
