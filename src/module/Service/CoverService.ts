@@ -30,13 +30,16 @@ export class CoverService implements ICoverService {
         userId: string,
     ): Promise<ICoverLetter> {
         //Get number of covers
-        const limit = await this.coverrepo.getDailyCoverCount(userId);
-        if (limit >= 3) {
-            throw new CustomError(
-                'Upgrade to Premium to get more access',
-                StatusCode.UNAUTHORIZED,
-            );
-        }
+
+        // Will uncomment this below when we intergrate payment
+
+        // const limit = await this.coverrepo.getDailyCoverCount(userId);
+        // if (limit >= 3) {
+        //     throw new CustomError(
+        //         'Upgrade to Premium to get more access',
+        //         StatusCode.UNAUTHORIZED,
+        //     );
+        // }
         if (data.infoType === InfoType.RESUME) {
             if (!data.resumeId) {
                 throw new CustomError(

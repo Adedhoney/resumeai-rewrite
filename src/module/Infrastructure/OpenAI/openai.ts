@@ -30,7 +30,7 @@ export class OpenAI implements IOpenAI {
         return letter;
     }
     async GetResumeCover(promptInfo: IPropmtInfo): Promise<string> {
-        const prompt = `${process.env.GPT_COVER_LETTER_RESUME_PROMPT}:
+        const prompt = `${config.PROMPTS.RESUME}:
             Name of company I am applying to: ${promptInfo.employer}.
             Role I am applying for: ${promptInfo.jobTitle}.
             role description: ${promptInfo.jobDescription}.
