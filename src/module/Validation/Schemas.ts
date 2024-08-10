@@ -12,14 +12,14 @@ export const GoogleSignInSchema = Joi.object({
 });
 
 export const SaveProfessionalInfoSchema = Joi.object({
-    skills: Joi.array()
-        .items(
-            Joi.object().keys({
-                skill: Joi.string().required(),
-                yearsOfExp: Joi.number().required(),
-            }),
-        )
-        .optional(),
+    skills: Joi.array().optional(),
+    // .items(
+    //     Joi.object().keys({
+    //         skill: Joi.string().required(),
+    //         yearsOfExp: Joi.number().required(),
+    //     }),
+    // )
+    // .optional(),
     workExp: Joi.array()
         .items(
             Joi.object().keys({
@@ -74,6 +74,6 @@ export const GenerateCoverSchema = Joi.object({
     jobTitle: Joi.string().required(),
     jobDescription: Joi.string().required(),
     infoType: Joi.string().required(),
-    resumeId: Joi.string().optional(),
+    coverId: Joi.string().optional(),
     manualInfo: Joi.object().optional(),
 });

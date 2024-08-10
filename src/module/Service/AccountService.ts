@@ -7,6 +7,7 @@ import {
     generateRandomId,
     generateRandomOTP,
     getCurrentTimeStamp,
+    StatusCode,
     verifyOtpToken,
 } from '@application/Utils';
 import {
@@ -97,19 +98,19 @@ export class AccountService implements IAccountService {
         await this.acctnotif.confirmMail(data.email, otp, data.firstName);
     }
 
-    async GoogleSignIn(googleToken: GoogleSignInDTO): Promise<loginPayload> {
+    async GoogleSignIn(data: GoogleSignInDTO): Promise<loginPayload> {
         // validate google authentication
-        const { data }: { data: GoogleUserDTO } = await axios.get(
-            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${googleToken}`,
+        const { data: userData }: { data: GoogleUserDTO } = await axios.get(
+            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${data.accessToken}`,
             {
                 headers: {
-                    Authorization: `Bearer ${googleToken}`,
+                    Authorization: `Bearer ${data.accessToken}`,
                     Accept: 'application/json',
                 },
             },
         );
 
-        const emailExists = await this.acctrepo.getUserByEmail(data.email);
+        const emailExists = await this.acctrepo.getUserByEmail(userData.email);
 
         if (emailExists) {
             const token = generateAuthToken(
@@ -120,21 +121,26 @@ export class AccountService implements IAccountService {
             delete emailExists.password;
             return { token, user: emailExists };
         }
+        console.log(userData);
+
+        if (!userData.verified_email) {
+            throw new CustomError('Unauthorized', StatusCode.UNAUTHORIZED);
+        }
 
         const userId = generateRandomId();
         const user = {
             userId,
-            email: data.email,
-            firstName: data.given_name,
-            lastName: data.family_name,
-            emailverified: data.verified_email,
+            email: userData.email,
+            firstName: userData.given_name,
+            lastName: userData.family_name,
+            emailVerified: userData.verified_email,
             filledPersonalInfo: false,
         };
         await this.acctrepo.saveUser(user);
 
         const token = generateAuthToken(user.userId, user.email);
 
-        return { token, user };
+        return { token, user: await this.acctrepo.getUserById(userId) };
     }
 
     async LogIn(data: ManualLogInDTO): Promise<loginPayload | void> {
@@ -257,6 +263,7 @@ export class AccountService implements IAccountService {
                 'Provide values for either skills, work experience or education',
             );
         }
+
         const repoData: ISaveProfessionalInfo = {};
         if (education) {
             const edus: IEducation[] = [];
@@ -278,10 +285,21 @@ export class AccountService implements IAccountService {
         }
         if (skills) {
             const skillsData: ISkill[] = [];
+
+            // Praise's skill recorrection, will remove once he integrates with the other one
+
             for (let info of skills) {
+                if (typeof info === 'string') {
+                    const skillName = String(info);
+                    const skill = { skill: skillName, userId, yearsOfExp: 1 };
+                    skillsData.push(skill);
+                    continue;
+                }
                 const skill = { ...info, userId };
                 skillsData.push(skill);
+                console.log('not string');
             }
+
             repoData.skills = skillsData;
         }
 

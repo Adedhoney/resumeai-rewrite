@@ -91,6 +91,7 @@ export class AccountRepository implements IAccountRepository {
                 >[] = data.skills;
                 await this.database.skill.bulkCreate(skills, {
                     fields: ['userId', 'skill', 'yearsOfExp'],
+                    updateOnDuplicate: ['yearsOfExp'],
                     transaction,
                 });
             }
