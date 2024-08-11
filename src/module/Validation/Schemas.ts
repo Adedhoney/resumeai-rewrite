@@ -74,6 +74,6 @@ export const GenerateCoverSchema = Joi.object({
     jobTitle: Joi.string().required(),
     jobDescription: Joi.string().required(),
     infoType: Joi.string().required(),
-    coverId: Joi.string().optional(),
+    resumeId: Joi.string().optional(),
     manualInfo: Joi.object().optional(),
 });
