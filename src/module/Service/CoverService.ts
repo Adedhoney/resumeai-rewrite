@@ -40,6 +40,8 @@ export class CoverService implements ICoverService {
         //         StatusCode.UNAUTHORIZED,
         //     );
         // }
+
+        let resumeInfo = '';
         if (data.infoType === InfoType.RESUME) {
             if (!data.resumeId) {
                 throw new CustomError(
@@ -50,20 +52,7 @@ export class CoverService implements ICoverService {
             const resume = await this.resumerepo.getResume(
                 data.resumeId as string,
             );
-            const coverLetter = await this.openaiservice.GetResumeCover({
-                ...data,
-                resume: resume.resumeText,
-            });
-            const coverId = generateRandomId();
-            const cover = {
-                coverLetter,
-                userId,
-                employer: data.employer,
-                jobTitle: data.jobTitle,
-                coverId,
-            };
-            await this.coverrepo.saveCover(cover);
-            return cover;
+            resumeInfo = resume.resumeText;
         } else if (data.infoType === InfoType.MANUAL) {
             if (!data.manualInfo) {
                 throw new CustomError(
@@ -72,26 +61,28 @@ export class CoverService implements ICoverService {
                 );
             }
             const info = JSON.stringify(data.manualInfo);
-            const coverLetter = await this.openaiservice.GetManualCover({
-                ...data,
-                manualInfo: info,
-            });
-            const coverId = generateRandomId();
-            const cover = {
-                coverLetter,
-                userId,
-                employer: data.employer,
-                jobTitle: data.jobTitle,
-                coverId,
-            };
-            await this.coverrepo.saveCover(cover);
-            return cover;
+            resumeInfo = info;
         } else {
             throw new CustomError(
                 `infoType must be equal to either to ${InfoType.MANUAL} or ${InfoType.RESUME}`,
                 400,
             );
         }
+
+        const coverLetter = await this.openaiservice.GenerateCover({
+            ...data,
+            resumeInfo,
+        });
+        const coverId = generateRandomId();
+        const cover = {
+            coverLetter,
+            userId,
+            employer: data.employer,
+            jobTitle: data.jobTitle,
+            coverId,
+        };
+        await this.coverrepo.saveCover(cover);
+        return cover;
     }
 
     async GetCover(coverId: string): Promise<ICoverLetter> {
