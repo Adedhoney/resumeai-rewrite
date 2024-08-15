@@ -1,7 +1,7 @@
 import { CustomError } from '@application/Error/Error';
-import { StatusCode, generateRandomId } from '@application/Utils';
+import { generateRandomId } from '@application/Utils';
 import { GenerateCoverDTO, InfoType } from '@module/Domain/DTO';
-import { ICoverLetter, IUser } from '@module/Domain/Model';
+import { ICoverLetter } from '@module/Domain/Model';
 import { ICoverRepository, IResumeRepository } from '@module/Domain/Repository';
 import { IOpenAI } from '@module/Infrastructure/OpenAI/openai';
 

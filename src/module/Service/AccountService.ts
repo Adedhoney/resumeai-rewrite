@@ -267,7 +267,7 @@ export class AccountService implements IAccountService {
         const repoData: ISaveProfessionalInfo = {};
         if (education) {
             const edus: IEducation[] = [];
-            for (let info of education) {
+            for (const info of education) {
                 const educationId = generateRandomId();
                 const edu = { ...info, educationId, userId };
                 edus.push(edu);
@@ -276,7 +276,7 @@ export class AccountService implements IAccountService {
         }
         if (workExp) {
             const workExperience: IWorkExperience[] = [];
-            for (let info of workExp) {
+            for (const info of workExp) {
                 const experienceId = generateRandomId();
                 const exp = { ...info, experienceId, userId };
                 workExperience.push(exp);
@@ -288,7 +288,7 @@ export class AccountService implements IAccountService {
 
             // Praise's skill recorrection, will remove once he integrates with the other one
 
-            for (let info of skills) {
+            for (const info of skills) {
                 if (typeof info === 'string') {
                     const skillName = String(info);
                     const skill = { skill: skillName, userId, yearsOfExp: 1 };

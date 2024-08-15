@@ -1,5 +1,4 @@
 import { BaseError } from '@application/Error/Error';
-import { ResponseDTO, ResponseStatus } from '@application/Response/Response';
 import { errorResponse } from '@application/Utils';
 import { NextFunction, Request, Response } from 'express';
 
@@ -18,10 +17,10 @@ export const ErrorHandler = (
         status = error.status;
         message = error.message;
 
-        errorResponse(res, message);
+        errorResponse(res, message, status);
         return next();
     }
 
-    errorResponse(res, message);
+    errorResponse(res, message, status);
     return next();
 };
