@@ -67,4 +67,3 @@ export class CoverLetter extends Model implements ICoverLetter {
     })
     declare coverLetter: string;
 }
-export default { name: 'coverLetter', table: CoverLetter };

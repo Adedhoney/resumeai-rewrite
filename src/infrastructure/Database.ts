@@ -1,5 +1,6 @@
 import config from '@application/Config/config';
 import {
+    ActivityLog,
     CoverLetter,
     Skill,
     UploadedResume,
@@ -13,6 +14,7 @@ import { Sequelize } from 'sequelize-typescript';
 export interface IDatabase {
     sequelize: Sequelize;
     Sequelize: typeof Sequelize;
+    activityLog: typeof ActivityLog;
     coverLetter: typeof CoverLetter;
     education: typeof Education;
     otp: typeof OTP;
@@ -23,6 +25,7 @@ export interface IDatabase {
 }
 
 const models = [
+    ActivityLog,
     CoverLetter,
     Skill,
     UploadedResume,
@@ -44,7 +47,8 @@ const sequelize = new Sequelize({
     models,
 });
 
-const Database = {
+const Database: IDatabase = {
+    activityLog: ActivityLog,
     coverLetter: CoverLetter,
     education: Education,
     otp: OTP,
@@ -56,4 +60,4 @@ const Database = {
     Sequelize: Sequelize,
 };
 
-export default Database as IDatabase;
+export default Database;

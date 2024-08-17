@@ -1,6 +1,9 @@
 import { generateRandomId } from '@application/Utils';
-import { IUploadedResume, IUser } from '@module/Domain/Model';
-import { IResumeRepository } from '@module/Domain/Repository';
+import { ActivityTypes, IUploadedResume, IUser } from '@module/Domain/Model';
+import {
+    IActivityRepository,
+    IResumeRepository,
+} from '@module/Domain/Repository';
 import { readFileSync, unlink } from 'fs';
 import pdf from 'pdf-parse';
 
@@ -11,8 +14,12 @@ export interface IResumeService {
 }
 
 export class ResumeService implements IResumeService {
-    constructor(private resumerepo: IResumeRepository) {
+    constructor(
+        private resumerepo: IResumeRepository,
+        private activityrepo: IActivityRepository,
+    ) {
         this.resumerepo = resumerepo;
+        this.activityrepo = activityrepo;
     }
     async UploadResume(
         file: Express.Multer.File,
@@ -33,6 +40,13 @@ export class ResumeService implements IResumeService {
         await this.resumerepo.saveResume(resume);
         unlink(filePath, (error) => {
             if (error) throw error;
+        });
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId: authData.userId,
+            activity: ActivityTypes.RESUME,
+            description: `Uploaded Resume`,
         });
         return resumeId;
     }
