@@ -1,3 +1,4 @@
+export * from './Activity';
 export * from './CoverLetter';
 export * from './Education';
 export * from './Otp';

@@ -1,5 +1,6 @@
 import config from '@application/Config/config';
 import {
+    ActivityLog,
     CoverLetter,
     Skill,
     UploadedResume,
@@ -8,16 +9,12 @@ import {
     OTP,
     Education,
 } from '@module/Domain/Model';
-import fs from 'fs';
-import path from 'path';
 import { Sequelize } from 'sequelize-typescript';
-
-// const basename = path.basename(__filename);
-// const env = process.env.NODE_ENV || 'development';
 
 export interface IDatabase {
     sequelize: Sequelize;
     Sequelize: typeof Sequelize;
+    activityLog: typeof ActivityLog;
     coverLetter: typeof CoverLetter;
     education: typeof Education;
     otp: typeof OTP;
@@ -27,16 +24,8 @@ export interface IDatabase {
     workExp: typeof WorkExperience;
 }
 
-const files = fs.readdirSync('src/module/Domain/Model').filter((file) => {
-    return (
-        file.indexOf('.') !== 0 &&
-        file !== 'index.ts' &&
-        file.slice(-3) === '.ts' &&
-        file.indexOf('.test.ts') === -1
-    );
-});
-
 const models = [
+    ActivityLog,
     CoverLetter,
     Skill,
     UploadedResume,
@@ -46,7 +35,7 @@ const models = [
     Education,
 ];
 
-let sequelize = new Sequelize({
+const sequelize = new Sequelize({
     database: config.DATABASE.database,
     dialect: config.DATABASE.dialect,
     username: config.DATABASE.username,
@@ -58,7 +47,8 @@ let sequelize = new Sequelize({
     models,
 });
 
-let Database = {
+const Database: IDatabase = {
+    activityLog: ActivityLog,
     coverLetter: CoverLetter,
     education: Education,
     otp: OTP,
@@ -70,7 +60,4 @@ let Database = {
     Sequelize: Sequelize,
 };
 
-export default Database as IDatabase;
-
-let test = Database;
-test.user.create;
+export default Database;

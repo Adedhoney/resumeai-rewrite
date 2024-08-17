@@ -99,7 +99,10 @@ export class AccountController {
         try {
             await this.service.ForgotPassword(req.params.email);
 
-            return successResponse(res, `OTP sent to ${req.params.email}`);
+            return successResponse(
+                res,
+                `If ${req.params.email} has a valid account, you will receive an OTP shortly`,
+            );
         } catch (err) {
             next(err);
         }

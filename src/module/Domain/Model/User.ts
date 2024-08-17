@@ -5,13 +5,8 @@ import {
     DataType,
     AutoIncrement,
     PrimaryKey,
-    NotNull,
-    BelongsTo,
     HasMany,
-    HasOne,
     Unique,
-    IsNull,
-    ForeignKey,
 } from 'sequelize-typescript';
 import { UploadedResume } from './UploadedResume';
 import { CoverLetter } from './CoverLetter';

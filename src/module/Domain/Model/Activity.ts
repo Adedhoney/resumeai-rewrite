@@ -7,37 +7,35 @@ import {
     PrimaryKey,
     BelongsTo,
     ForeignKey,
-    Unique,
 } from 'sequelize-typescript';
 import { User } from './User';
 
-export interface ICoverLetter {
+export enum ActivityTypes {
+    SIGN_UP = 'Sign up',
+    LOGIN = 'Login',
+    COVER_LETTER = 'Cover Letter',
+    RESUME = 'Resume',
+    SETTINGS = 'Settings',
+}
+
+export interface IActivityLog {
     id?: number;
-    coverId: string;
     userId: string;
-    employer: string;
-    jobTitle: string;
-    coverLetter: string;
+    activity: string;
+    description: string;
     createdAt?: string;
     updatedAt?: string;
 }
 
 @Table({
-    tableName: 'cover_letters',
+    tableName: 'activities',
     timestamps: true, // If you want to manage createdAt and updatedAt timestamps
 })
-export class CoverLetter extends Model implements ICoverLetter {
+export class ActivityLog extends Model implements IActivityLog {
+    @PrimaryKey
     @AutoIncrement
-    @Unique
     @Column
     declare id?: number;
-
-    @PrimaryKey
-    @Column({
-        type: DataType.UUID,
-        allowNull: false,
-    })
-    declare coverId: string;
 
     @ForeignKey(() => User)
     @Column({
@@ -53,17 +51,11 @@ export class CoverLetter extends Model implements ICoverLetter {
         type: DataType.STRING,
         allowNull: false,
     })
-    declare employer: string;
+    declare activity: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    declare jobTitle: string;
-
-    @Column({
-        type: DataType.TEXT('long'),
-        allowNull: false,
-    })
-    declare coverLetter: string;
+    declare description: string;
 }

@@ -1,8 +1,12 @@
 import { CustomError } from '@application/Error/Error';
-import { StatusCode, generateRandomId } from '@application/Utils';
+import { generateRandomId } from '@application/Utils';
 import { GenerateCoverDTO, InfoType } from '@module/Domain/DTO';
-import { ICoverLetter, IUser } from '@module/Domain/Model';
-import { ICoverRepository, IResumeRepository } from '@module/Domain/Repository';
+import { ActivityTypes, ICoverLetter } from '@module/Domain/Model';
+import {
+    IActivityRepository,
+    ICoverRepository,
+    IResumeRepository,
+} from '@module/Domain/Repository';
 import { IOpenAI } from '@module/Infrastructure/OpenAI/openai';
 
 export interface ICoverService {
@@ -19,10 +23,12 @@ export class CoverService implements ICoverService {
         private coverrepo: ICoverRepository,
         private resumerepo: IResumeRepository,
         private openaiservice: IOpenAI,
+        private activityrepo: IActivityRepository,
     ) {
         this.coverrepo = coverrepo;
         this.resumerepo = resumerepo;
         this.openaiservice = openaiservice;
+        this.activityrepo = activityrepo;
     }
 
     async GenerateCover(
@@ -82,6 +88,14 @@ export class CoverService implements ICoverService {
             coverId,
         };
         await this.coverrepo.saveCover(cover);
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId,
+            activity: ActivityTypes.COVER_LETTER,
+            description: `Generated Cover letter`,
+        });
+
         return cover;
     }
 

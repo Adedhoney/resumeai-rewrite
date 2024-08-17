@@ -6,6 +6,7 @@ import {
 } from '@module/Controller';
 import {
     AccountRepository,
+    ActivityRepository,
     CoverRepository,
     ResumeRepository,
 } from '@module/Domain/Repository';
@@ -32,17 +33,22 @@ const db = Database;
 db.sequelize.sync().then(() => console.log('synced'));
 
 const acctrepo = new AccountRepository(db);
+const activityrepo = new ActivityRepository(db);
 const coverrepo = new CoverRepository(db);
 const resumerepo = new ResumeRepository(db);
 const openai = new OpenAI();
 const acctnotif = new AccountNotification();
 
 const Auth = Authentication(acctrepo);
-const acctctr = new AccountController(new AccountService(acctrepo, acctnotif));
-const coverctr = new CoverController(
-    new CoverService(coverrepo, resumerepo, openai),
+const acctctr = new AccountController(
+    new AccountService(acctrepo, acctnotif, activityrepo),
 );
-const resumectr = new ResumeController(new ResumeService(resumerepo));
+const coverctr = new CoverController(
+    new CoverService(coverrepo, resumerepo, openai, activityrepo),
+);
+const resumectr = new ResumeController(
+    new ResumeService(resumerepo, activityrepo),
+);
 
 // // account
 router.post(

@@ -23,15 +23,17 @@ import {
     GoogleUserDTO,
 } from '@module/Domain/DTO';
 import {
+    ActivityTypes,
     IEducation,
     ISkill,
     IUser,
     IWorkExperience,
 } from '@module/Domain/Model';
 import {
+    IActivityRepository,
     IAccountRepository,
     ISaveProfessionalInfo,
-} from '@module/Domain/Repository/AccountRepository';
+} from '@module/Domain/Repository';
 import { IAccountNotification } from '@module/Infrastructure/Notification';
 import axios from 'axios';
 
@@ -61,9 +63,11 @@ export class AccountService implements IAccountService {
     constructor(
         private acctrepo: IAccountRepository,
         private acctnotif: IAccountNotification,
+        private activityrepo: IActivityRepository,
     ) {
         this.acctrepo = acctrepo;
         this.acctnotif = acctnotif;
+        this.activityrepo = activityrepo;
     }
 
     async ManualSignUp(data: ManualSignUpDTO): Promise<void> {
@@ -96,6 +100,13 @@ export class AccountService implements IAccountService {
             expiresAt: `${Date.now() / 1000 + 1200}`,
         });
         await this.acctnotif.confirmMail(data.email, otp, data.firstName);
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId,
+            activity: ActivityTypes.SIGN_UP,
+            description: `Sign up by ${data.firstName} ${data.lastName} userId: ${userId}`,
+        });
     }
 
     async GoogleSignIn(data: GoogleSignInDTO): Promise<loginPayload> {
@@ -140,6 +151,13 @@ export class AccountService implements IAccountService {
 
         const token = generateAuthToken(user.userId, user.email);
 
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId,
+            activity: ActivityTypes.LOGIN,
+            description: `Google sign in`,
+        });
+
         return { token, user: await this.acctrepo.getUserById(userId) };
     }
 
@@ -171,6 +189,13 @@ export class AccountService implements IAccountService {
 
         delete user.password;
 
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId: user.userId,
+            activity: ActivityTypes.LOGIN,
+            description: `Manual log in`,
+        });
+
         return { token, user };
     }
 
@@ -188,6 +213,13 @@ export class AccountService implements IAccountService {
 
         delete user.password;
 
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId: user.userId,
+            activity: ActivityTypes.SETTINGS,
+            description: `Email verification`,
+        });
+
         return { token, user };
     }
 
@@ -204,9 +236,7 @@ export class AccountService implements IAccountService {
     async ForgotPassword(email: string): Promise<void> {
         const user = await this.acctrepo.getUserByEmail(email);
         if (!user) {
-            throw new CustomError(
-                'Not account is associated with this email address',
-            );
+            return;
         }
         const otp = generateRandomOTP();
         await this.acctrepo.saveOTP({
@@ -215,6 +245,13 @@ export class AccountService implements IAccountService {
             expiresAt: `${Date.now() / 1000 + 1200}`,
         });
         await this.acctnotif.forgotPasswordEmail(email, otp, user.firstName);
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId: user.userId,
+            activity: ActivityTypes.SETTINGS,
+            description: `Password reset request`,
+        });
     }
 
     async VerifyOTP(data: VerifyOtpDTO): Promise<{ token: string }> {
@@ -239,6 +276,13 @@ export class AccountService implements IAccountService {
             throw new CustomError('User not found', 400);
         }
         await this.acctrepo.updatePassword(user.userId, password);
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId: user.userId,
+            activity: ActivityTypes.SETTINGS,
+            description: `Password reset`,
+        });
     }
 
     async GiveFeedback(data: FeedbackDTO, authData: IUser): Promise<void> {
@@ -267,7 +311,7 @@ export class AccountService implements IAccountService {
         const repoData: ISaveProfessionalInfo = {};
         if (education) {
             const edus: IEducation[] = [];
-            for (let info of education) {
+            for (const info of education) {
                 const educationId = generateRandomId();
                 const edu = { ...info, educationId, userId };
                 edus.push(edu);
@@ -276,7 +320,7 @@ export class AccountService implements IAccountService {
         }
         if (workExp) {
             const workExperience: IWorkExperience[] = [];
-            for (let info of workExp) {
+            for (const info of workExp) {
                 const experienceId = generateRandomId();
                 const exp = { ...info, experienceId, userId };
                 workExperience.push(exp);
@@ -288,7 +332,7 @@ export class AccountService implements IAccountService {
 
             // Praise's skill recorrection, will remove once he integrates with the other one
 
-            for (let info of skills) {
+            for (const info of skills) {
                 if (typeof info === 'string') {
                     const skillName = String(info);
                     const skill = { skill: skillName, userId, yearsOfExp: 1 };
@@ -304,6 +348,13 @@ export class AccountService implements IAccountService {
         }
 
         await this.acctrepo.saveProfessionalInfo(repoData);
+
+        // save activity
+        this.activityrepo.saveActivityLog({
+            userId,
+            activity: ActivityTypes.SETTINGS,
+            description: `Professional info update`,
+        });
     }
     async GetProfessionalInfo(userId: string): Promise<IUser> {
         const user = await this.acctrepo.getProfessionalInfo(userId);
